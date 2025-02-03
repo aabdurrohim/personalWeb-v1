@@ -1,3 +1,5 @@
+This my experiment to createing a personal website using react, and it still run on locally!
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
