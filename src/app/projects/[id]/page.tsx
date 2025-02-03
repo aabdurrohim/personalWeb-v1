@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaFolder, FaArrowLeft, FaExclamationTriangle } from "react-icons/fa";
-import { useParams } from "next/navigation"; // Import useParams
+import { FaArrowLeft } from "react-icons/fa";
+import { useParams } from "next/navigation";
 import { BlinkBlur } from "react-loading-indicators";
+import { AlertCircle, Tag, FileText, Clock } from "lucide-react";
 
 interface Project {
   id: number;
@@ -15,8 +16,7 @@ interface Project {
 }
 
 export default function ProjectDetail() {
-  // Renamed to ProjectDetail
-  const { id } = useParams<{ id: string }>(); // Get ID from URL
+  const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function ProjectDetail() {
           throw new Error("Project ID is missing.");
         }
 
-        const numericId = parseInt(id, 10); // Convert id to a number
+        const numericId = parseInt(id, 10);
         if (isNaN(numericId)) {
           throw new Error("Invalid project ID. ID must be a number.");
         }
@@ -41,7 +41,6 @@ export default function ProjectDetail() {
         }
 
         const res = await fetch(`${apiBaseUrl}/project/${numericId}`, {
-          // Use ID in URL
           headers: {
             "X-API-KEY": apiKey,
           },
@@ -63,58 +62,81 @@ export default function ProjectDetail() {
     };
 
     fetchData();
-  }, [id]); // Add 'id' to dependency array
+  }, [id]);
 
-  if (loading)
+  if (loading) {
     return (
-      <p className="flex flex-col items-center justify-center text-center mt-8">
+      <div className="flex flex-col items-center justify-center min-h-[50vh]">
         <BlinkBlur color="#000000" size="small" text="" textColor="" />
-        Loading...
-      </p>
+        <p className="mt-4 text-gray-500">Loading project details...</p>
+      </div>
     );
+  }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center text-center">
-        <FaExclamationTriangle className="text-red-500 text-4xl mb-2" />
-        <p className="text-red-500 text-lg font-semibold">{error}</p>
-        <Link href="/Project" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
-          {" "}
-          {/* Corrected link */}
-          <FaArrowLeft className="inline-block mr-2" /> Back to Projects
+      <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
+        <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
+        <p className="text-gray-800 text-lg mb-6">{error}</p>
+        <Link href="/projects" className="group flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded transition duration-200">
+          <FaArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform duration-200" />
+          <span>Back to Projects</span>
         </Link>
       </div>
     );
   }
 
-  if (!project) return <p className="text-center">Project not found</p>; // Handle null project
+  if (!project) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh]">
+        <p className="text-gray-600 mb-4">Project not found</p>
+        <Link href="/projects" className="text-gray-600 hover:bg-gray-100 px-3 py-1 rounded transition-colors duration-200">
+          Return to projects
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto p-8 flex-grow">
-        {" "}
-        {/* Content area */}
-        <section className="bg-white rounded-xl w-full">
-          {" "}
-          {/* Pastikan section memenuhi lebar parent */}
-          <div className="p-6">
-            {" "}
-            {/* Tambahkan padding di dalam section */}
-            <h2 className="text-lg">
-              <Link href="/projects" className="flex items-center gap-2 text-gray-700 hover:underline">
-                <FaArrowLeft />
-                Back
-              </Link>
-            </h2>
-            <div className="mt-4">
-              {" "}
-              {/* Spasi antara back link dan judul */}
-              <h1 className="text-2xl font-bold text-gray-900">{project.title}</h1>
-              <p className="mt-2">{project.description}</p>
-              <p className="mt-2">Category: {project.categories}</p>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* Notion-style navigation */}
+        <nav className="mb-8">
+          <Link href="/projects" className="inline-flex items-center text-gray-600 hover:bg-gray-100 px-2 py-1 rounded transition-colors duration-200">
+            <FaArrowLeft className="mr-2 w-3 h-3" />
+            <span className="text-sm">Back to Projects</span>
+          </Link>
+        </nav>
+
+        {/* Notion-style content */}
+        <article className="space-y-8">
+          {/* Title section */}
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold text-gray-900 hover:bg-gray-100 inline-block px-1 rounded cursor-text">{project.title}</h1>
+
+            {/* Categories */}
+            {project.categories && (
+              <div className="flex flex-wrap gap-1 px-1">
+                {project.categories.split(",").map((category, index) => (
+                  <span key={index} className="inline-flex items-center px-2 py-0.5 text-xs text-gray-500 bg-gray-100 rounded">
+                    {category.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Description section */}
+          <div className="hover:bg-gray-100 p-3 rounded-lg transition-colors duration-200">
+            <div className="flex items-start gap-2">
+              <FileText className="w-4 h-4 text-gray-400 mt-1" />
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-1">Description</div>
+                <p className="text-gray-700 whitespace-pre-wrap">{project.description}</p>
+              </div>
             </div>
           </div>
-        </section>
+        </article>
       </div>
     </div>
   );
