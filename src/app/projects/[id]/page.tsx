@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaFolder, FaArrowLeft, FaExclamationTriangle } from "react-icons/fa";
 import { useParams } from "next/navigation"; // Import useParams
+import { BlinkBlur } from "react-loading-indicators";
 
 interface Project {
   id: number;
@@ -64,7 +65,13 @@ export default function ProjectDetail() {
     fetchData();
   }, [id]); // Add 'id' to dependency array
 
-  if (loading) return <p className="text-gray-500 text-center">Loading...</p>;
+  if (loading)
+    return (
+      <p className="flex flex-col items-center justify-center text-center mt-8">
+        <BlinkBlur color="#000000" size="small" text="" textColor="" />
+        Loading...
+      </p>
+    );
 
   if (error) {
     return (
@@ -83,17 +90,32 @@ export default function ProjectDetail() {
   if (!project) return <p className="text-center">Project not found</p>; // Handle null project
 
   return (
-    <section className="bg-white rounded-xl max-w-4xl mx-auto">
-      <h2 className="text-lg">
-        <Link href="/projects" className="flex items-center gap-2 text-gray-700 hover:underline">
-          <FaArrowLeft />
-          Back
-        </Link>
-      </h2>
-      <h1 className="text-2xl font-bold text-gray-900 mt-3">{project.title}</h1> {/* Display project title */}
-      {project.image && <img src={`${apiBaseUrl}${project.image}`} alt={project.title} className="mt-4 rounded-lg" />} {/* Display image if available */}
-      <p className=" mt-2">{project.description}</p> {/* Display description */}
-      <p className=" mt-2">Category: {project.categories}</p> {/* Display categories */}
-    </section>
+    <div className="flex flex-col min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto p-8 flex-grow">
+        {" "}
+        {/* Content area */}
+        <section className="bg-white rounded-xl w-full">
+          {" "}
+          {/* Pastikan section memenuhi lebar parent */}
+          <div className="p-6">
+            {" "}
+            {/* Tambahkan padding di dalam section */}
+            <h2 className="text-lg">
+              <Link href="/projects" className="flex items-center gap-2 text-gray-700 hover:underline">
+                <FaArrowLeft />
+                Back
+              </Link>
+            </h2>
+            <div className="mt-4">
+              {" "}
+              {/* Spasi antara back link dan judul */}
+              <h1 className="text-2xl font-bold text-gray-900">{project.title}</h1>
+              <p className="mt-2">{project.description}</p>
+              <p className="mt-2">Category: {project.categories}</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 }

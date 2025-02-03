@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { BlinkBlur } from "react-loading-indicators";
 import { FaFolder, FaArrowLeft, FaExclamationTriangle } from "react-icons/fa";
 
 interface Project {
@@ -54,7 +55,13 @@ export default function Project() {
     fetchData();
   }, []);
 
-  if (loading) return <p className="text-gray-500 text-center">Loading...</p>;
+  if (loading)
+    return (
+      <p className="flex flex-col items-center justify-center text-center mt-8">
+        <BlinkBlur color="#000000" size="small" text="" textColor="" />
+        Loading...
+      </p>
+    );
 
   if (error)
     return (
@@ -68,7 +75,7 @@ export default function Project() {
     );
 
   return (
-    <section className="bg-white rounded-xl max-w-4xl mx-auto">
+    <section className="bg-white max-w-4xl mx-auto my-8">
       <h2 className="text-lg">
         <Link href="/" className="flex items-center gap-2 text-gray-700 hover:underline">
           <FaArrowLeft />
